@@ -294,3 +294,36 @@ In Production you should modify at a minimum the following subjects:
 
 - php handler: mod_php=> php-fpm
 - secure mysql users with proper source IP limitations
+
+## How to run the moodle project
+**It is important that you follow the steps in order so that there are no errors in the build**
+- Copy sample.env and remove the sample in the name
+- Change the PHP version to 73 (php73) and the mysql version to 57 (mysql57)
+- Run the following command in the **root** of the project (it will build and create the LAMP application containers)
+ˋˋˋ
+docker-compose up -d
+ˋˋˋ
+- Change the mysql access credentials in .env to (MYSQL_USER) root and (MYSQL_PASSWORD) tiger
+- Insert the moodle project into the www folder
+- Change the moodle project permissions to 777
+- Open [phpmyadmin](http://localhost:8080/) and import the moodle database with the name given in the project's config.php.
+- Run the first command below and get the container id from lamp_database
+ˋˋˋ
+docker ps
+ˋˋˋ
+- Then insert this id in place of the $$ in the command below, and save the external ip of the mysql container that we will use in the next steps
+ˋˋˋ
+docker inspect $$ | grep "IPAddress"
+ˋˋˋ
+- Insert this ip in place of localhost in the dbhost field in config.php in the root of the moodle project.
+- Change dbuser to root
+- Change dbpassword to tiger
+- Change dbport to 3306
+- Change wwwroot to http://localhost/your-project-name
+- Change dataroot to /var/moodle-data
+- Run the commands below to enter the webserver container via bash and then change the permissions of the /var/moodle-data directory to 777, to exit just type exit
+ˋˋˋ
+docker compose exec webserver bash
+cd /var && chmod 777 moodle-data
+ˋˋˋ
+- Now your moodle project is running locally
